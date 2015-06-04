@@ -1,0 +1,25 @@
+{
+  "name": "good-thumbs",
+  "version": "1.0.0",
+  "description": "Generate good thumbnails with using either vips, graphicsmagick, imagemagick.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "thumb",
+    "thumbnail",
+    "image",
+    "resize",
+    "crop"
+  ],
+  "author": "Martin Heidegger <martin.heidegger@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "mkdirp": "^0.5.1"
+  },
+  "optionalDependencies": { 
+    "gm": "^1.18.1",
+    "sharp": "^0.10.1"
+  }
+}

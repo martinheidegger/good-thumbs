@@ -1,0 +1,1 @@
+module.exports = require('./banners/1500x500');
