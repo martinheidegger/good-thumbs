@@ -134,6 +134,29 @@ var thumbs = require('good-thumbs')({
 });
 ```
 
+## Generate all thumbs
+
+To use this for a static site generator or to make sure that all thumbs are available at start of the application it is possible to create all possible thumbs using `createAll`.
+
+```JavaScript
+thumbs.createAll(function (err, createdThumbSet) {
+  for (var source in createdThumbSet) {
+    var sourceSet = createdThumbSet;
+    for (var preset in sourceSet) {
+      console.log("Create a '" + preset + "' for '" + source + "' at '" + sourceSet[preset] + "'");
+    }
+  }
+});
+```
+
+You can also specify the presets that should be created:
+
+```JavaScript
+thumbs.createAll([{width: 200}], function (err, createThumbSet) {
+  //...
+});
+```
+
 # Thoughts on improvement
 
 At the current stage this is just little more than a proof-of-concept. With a little love from you I think it can be really great. Here are some thoughts of me on how to improve this baby:

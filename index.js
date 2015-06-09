@@ -14,7 +14,6 @@ function GoodThumbs(options) {
 		return new GoodThumbs(options);
 	}
 	this.cacheDir = Path.resolve(options.cacheDir);
-	mkdirp.sync(this.cacheDir);
 	this.cwd = Path.resolve(options.cwd);
 	this.timestamps = {};
 	this.createCallbacks = {};
@@ -29,6 +28,46 @@ function GoodThumbs(options) {
 		}
 	}
 }
+GoodThumbs.prototype.createAll = function (presets, callback) {
+	if (typeof presets === 'function') {
+		callback = presets;
+		presets = null;
+	}
+	if (!presets) {
+		presets = this.presets;
+	}
+	var that = this;
+	require('glob')('/**/*.{jpg,JPG,jpeg,png,PNG,gif,GIF}', {
+		root: this.cwd
+	}, function (err, sourceFiles) {
+		if (err) {
+			return callback(err);
+		}
+		var combinations = require('./lib/createCombinations')(sourceFiles, Object.keys(presets))
+		var result = {};
+		require('async').eachLimit(combinations, 4, function (combi, callback) {
+			var source = combi.a;
+			var preset = combi.b;
+			that.createByPreset(source, preset, function (err, target) {
+				if (err) {
+					return callback(err);
+				}
+				var thumbList = result[source];
+				if (!thumbList) {
+					thumbList = {};
+					result[source] = thumbList;
+				}
+				thumbList[preset] = target;
+				callback();
+			});
+		}, function (err) {
+			if (err) {
+				return callback(err);
+			}
+			callback(null, result);
+		});
+	})
+};
 GoodThumbs.prototype.createByPreset = function(source, preset, callback) {
 	if (typeof preset !== 'string') {
 		return setImmediate(
@@ -96,27 +135,29 @@ GoodThumbs.prototype.create = function (source, inputFormat, callback) {
 
 		var createCallbacks = this.createCallbacks;
 		if (!createCallbacks[key]) {
-			if (!fs.existsSync(source)) {
-				return callback(new SourceMissingError(source));
-			}
-
-			createCallbacks[key] = [callback];
-
-			var checkTime = Date.now() + this.checkInterval;
-			this.system(source, target, formatParams, function (err) {
-				var callbacks = createCallbacks[key];
-				if (err) {
-					console.log(err)
-					err = new ConvertError(source, format, err);
+			fs.exists(source, function (exists) {
+				if (!exists) {
+					return callback(new SourceMissingError(source));
 				}
-				delete createCallbacks[key];
-				callbacks.forEach(function (callback) {
-					callback(err, err ? undefined : target);
-				});
-			});
+				createCallbacks[key] = [callback];
+				mkdirp(Path.dirname(target), function (err) {
+					var checkTime = Date.now() + this.checkInterval;
+					this.system(source, target, formatParams, function (err) {
+						var callbacks = createCallbacks[key];
+						if (err) {
+							console.log(err)
+							err = new ConvertError(source, format, err);
+						}
+						delete createCallbacks[key];
+						callbacks.forEach(function (callback) {
+							callback(err, err ? undefined : target);
+						});
+					});
+				}.bind(this));
+			}.bind(this));
 		} else {
 			createCallbacks[key].push(callback);
 		}
 	}.bind(this));
-}
+};
 module.exports = GoodThumbs;
