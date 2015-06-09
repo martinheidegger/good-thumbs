@@ -46,22 +46,42 @@ GoodThumbs.prototype.create = function (source, inputFormat, callback) {
 			return callback(new IllegalPathError(source));
 		}
 
-		var format = typeof inputFormat === 'string' ? this.presets[inputFormat] : inputFormat;
+		var format;
+		var formatName;
+		if (typeof inputFormat === 'string') {
+			format = this.presets[inputFormat];
+			formatName = inputFormat;
+		} else {
+			format = inputFormat;
+		}
+		if (format.name) {
+			formatName = format.name;
+		}
 		if (!format) {
 			return callback(new MissingFormatError(source, inputFormat));
 		}
 
+		var sourceExt = Path.extname(source).substr(1).toLowerCase();
 		var formatParams = {
 			width:   format.width,
 			height:  format.height,
 			fill:    format.fill || false,
-			type:    format.type || Path.extname(source).substr(1),
 			gravity: format.gravity || require('./gravity/center'),
+			type:    (format.type || sourceExt).toLowerCase(),
 			quality: (typeof format.quality === 'number' ? format.quality : 85),
 			withoutEnlargement: (typeof format.withoutEnlargement === 'boolean' ? format.withoutEnlargement : true)
 		};
+		if (!formatName) {
+			formatName = hash(JSON.stringify(formatParams));
+		}
 
-		var key = hash(JSON.stringify({f: format, s: source})) + '.' + formatParams.type;
+		// Remove the extension from the key to 
+		var key = Path.relative(this.cwd, source);
+		if (sourceExt === formatParams.type) {
+			key = key.substr(0, key.length - sourceExt.length - 1);
+		}
+
+		key = key + '.' + formatName + '.' + formatParams.type;
 		var target = Path.join(this.cacheDir, key);
 		var timestamps = this.timestamps;
 
