@@ -62,7 +62,7 @@ GoodThumbs.prototype.create = function (source, inputFormat, callback) {
 			withoutEnlargement: (typeof format.withoutEnlargement === 'boolean' ? format.withoutEnlargement : true)
 		};
 
-		var key = hash(JSON.stringify(format)) + '.' + formatParams.type;
+		var key = hash(JSON.stringify({f: format, s: source})) + '.' + formatParams.type;
 		var target = Path.join(this.cacheDir, key);
 		var timestamps = this.timestamps;
 
