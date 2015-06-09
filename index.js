@@ -3,7 +3,6 @@ var Path = require('path');
 var fs = require('fs');
 
 var hash = require('./lib/hash');
-var gravity = require('./gravity');
 
 var MissingFormatError = require('./error/MissingFormatError');
 var SourceMissingError = require('./error/SourceMissingError');
@@ -56,8 +55,8 @@ GoodThumbs.prototype.create = function (source, inputFormat, callback) {
 			width:   format.width,
 			height:  format.height,
 			fill:    format.fill || false,
-			gravity: format.gravity || gravity.center,
 			type:    format.type || Path.extname(source).substr(1),
+			gravity: format.gravity || require('./gravity/center'),
 			quality: (typeof format.quality === 'number' ? format.quality : 85),
 			withoutEnlargement: (typeof format.withoutEnlargement === 'boolean' ? format.withoutEnlargement : true)
 		};
