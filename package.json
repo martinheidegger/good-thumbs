@@ -1,6 +1,6 @@
 {
   "name": "good-thumbs",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Generate good thumbnails with using either vips, graphicsmagick, imagemagick.",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   "dependencies": {
     "mkdirp": "^0.5.1"
   },
-  "optionalDependencies": { 
+  "optionalDependencies": {
     "gm": "^1.18.1",
     "sharp": "^0.10.1"
   }
