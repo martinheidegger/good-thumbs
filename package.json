@@ -1,6 +1,6 @@
 {
   "name": "good-thumbs",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Generate good thumbnails with using either vips, graphicsmagick, imagemagick.",
   "main": "index.js",
   "scripts": {
